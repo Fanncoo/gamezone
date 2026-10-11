@@ -416,7 +416,12 @@
     $("type").value = article?.type || "article";
     $("category").value = article?.category || "ИГРЫ";
     $("excerpt").value = article?.excerpt || "";
-    $("body").value = article?.body || "";
+    $("body").innerHTML = cleanArticleHtml(article?.body || "");
+$("cover-url").value = article?.cover_url || "";
+updateCoverPreview();
+$("body").contentEditable = "true";
+$("toggle-preview").textContent = "Предпросмотр";
+updateWordCount();
     $("symbol").value = article?.symbol || "🎮";
     $("color").value = article?.color || "#a04dff";
     $("published").checked = article?.published === true;
