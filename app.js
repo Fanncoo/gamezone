@@ -28,7 +28,16 @@ async function readArticle(id){const a=articles.find(x=>String(x.id)===String(id
 document.addEventListener("click",async e=>{const likeBtn=e.target.closest("[data-like]");if(likeBtn){like(likeBtn.dataset.like);return}const read=e.target.closest("[data-read]");if(read){readArticle(read.dataset.read);return}const close=e.target.closest("[data-close]");if(close){$(close.dataset.close).classList.add("hidden");return}const delComment=e.target.closest("[data-delete-comment]");if(delComment&&db&&currentUser&&confirm("Удалить комментарий?")){const {error}=await db.from("comments").delete().eq("id",delComment.dataset.deleteComment);if(error)notify(error.message);else{const articleId=$("article-content").querySelector("[data-like]")?.dataset.like;if(articleId)readArticle(articleId);notify("Комментарий удалён")}return}if(e.target.classList.contains("modal-backdrop"))e.target.classList.add("hidden")});
 document.querySelectorAll("[data-filter]").forEach(b=>b.addEventListener("click",()=>{activeFilter=b.dataset.filter;render()}));
 $("login-open").onclick=()=>openAuth("login");$("register-open").onclick=()=>openAuth("register");$("join-open").onclick=()=>openAuth("register");$("auth-switch").onclick=()=>openAuth(authMode==="login"?"register":"login");$("auth-form").addEventListener("submit",submitAuth);
-$("account-btn").onclick=async()=>{if(!currentUser)return;const yes=confirm(`Аккаунт: ${currentUser.email}\nВыйти из аккаунта?`);if(yes&&db){await db.auth.signOut();await loadProfile();notify("Ты вышел из аккаунта.")}};
+
+$("account-btn").onclick = () => {
+  if (!currentUser) {
+    openAuth("login");
+    return;
+  }
+
+  window.location.href = "profile.html";
+};
+
 $("search-toggle").onclick=()=>$("search-row").classList.toggle("hidden");function search(){const q=$("search-input").value.trim().toLowerCase();document.querySelectorAll(".game-card").forEach(el=>el.classList.toggle("hidden",!!q&&!el.textContent.toLowerCase().includes(q)));if(q)$("articles").scrollIntoView({behavior:"smooth"})}$("search-btn").onclick=search;$("search-input").addEventListener("keydown",e=>{if(e.key==="Enter")search()});
 if(db)db.auth.onAuthStateChange(()=>setTimeout(loadProfile,0));loadArticles().then(loadProfile);
 })();
