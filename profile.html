@@ -1,1 +1,254 @@
 
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Мой профиль — GameZone</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+.profile-wrap{max-width:1000px;margin:50px auto;padding:24px}
+.profile-panel{background:#171923;border:1px solid #303443;border-radius:16px;padding:24px;margin:20px 0}
+.profile-wrap input,.profile-wrap textarea,.profile-wrap select{display:block;width:100%;box-sizing:border-box;margin:8px 0 16px;padding:12px;border-radius:8px;border:1px solid #45495b;background:#101119;color:white}
+.profile-wrap textarea{min-height:150px}
+.profile-wrap label{display:block;color:#ddd}
+.profile-wrap .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.profile-wrap button{cursor:pointer;padding:10px 16px;border:0;border-radius:8px}
+.article-row{padding:16px 0;border-bottom:1px solid #303443}
+.muted{color:#a7aabd}
+#message{white-space:pre-wrap}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="./"><span class="brand-mark">G</span> GAME<span>ZONE</span></a>
+  <a href="./" class="text-link">← На главную</a>
+</header>
+
+<main class="profile-wrap">
+  <div class="eyebrow">GAMEZONE ACCOUNT</div>
+  <h1>Мой профиль</h1>
+  <p id="user-info" class="muted">Проверяем авторизацию...</p>
+  <p id="message" role="status"></p>
+
+  <section id="login-panel" class="profile-panel" hidden>
+    <h2>Войди в аккаунт</h2>
+    <p>Используй аккаунт GameZone, который ты уже зарегистрировал.</p>
+    <form id="login-form">
+      <label>Email<input id="email" type="email" required></label>
+      <label>Пароль<input id="password" type="password" required></label>
+      <button class="btn btn-red" type="submit">Войти</button>
+    </form>
+  </section>
+
+  <section id="editor" class="profile-panel" hidden>
+    <h2 id="editor-title">Создать статью</h2>
+    <form id="article-form">
+      <label>Заголовок<input id="title" maxlength="160" required></label>
+      <label>Тип публикации
+        <select id="type">
+          <option value="article">Статья</option>
+          <option value="news">Новость</option>
+          <option value="review">Обзор</option>
+        </select>
+      </label>
+      <label>Категория<input id="category" maxlength="60" value="ИГРЫ" required></label>
+      <label>Краткое описание<textarea id="excerpt" maxlength="500" required></textarea></label>
+      <label>Текст статьи<textarea id="body" required></textarea></label>
+      <label>Символ или эмодзи<input id="symbol" maxlength="10" value="🎮" required></label>
+      <label>Цвет обложки
+        <select id="color">
+          <option value="#a04dff">Фиолетовый</option>
+          <option value="#f04452">Красный</option>
+          <option value="#3273d9">Синий</option>
+          <option value="#20a879">Зелёный</option>
+          <option value="#f59e0b">Оранжевый</option>
+        </select>
+      </label>
+      <label><input id="published" type="checkbox" style="display:inline;width:auto"> Опубликовать сразу</label>
+      <div class="actions">
+        <button class="btn btn-red" id="save-btn" type="submit">Сохранить статью</button>
+        <button type="button" id="cancel-edit">Отмена</button>
+      </div>
+    </form>
+  </section>
+
+  <section id="articles-panel" class="profile-panel" hidden>
+    <div class="section-heading">
+      <h2>Мои статьи</h2>
+      <button class="btn btn-red" id="new-article">+ Создать статью</button>
+    </div>
+    <div id="my-articles"></div>
+  </section>
+  <button id="logout" hidden>Выйти из аккаунта</button>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+(() => {
+  const cfg = window.GAMEZONE_CONFIG || {};
+  const $ = id => document.getElementById(id);
+  const message = text => $("message").textContent = text;
+  const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[c]);
+
+  if (!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY || !window.supabase) {
+    message("Не удалось подключить Supabase. Проверь config.js.");
+    return;
+  }
+
+  const db = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+  let user = null;
+  let articles = [];
+  let editingId = null;
+
+  function showEditor(article = null) {
+    editingId = article ? article.id : null;
+    $("editor-title").textContent = article ? "Редактировать статью" : "Создать статью";
+    $("title").value = article?.title || "";
+    $("type").value = article?.type || "article";
+    $("category").value = article?.category || "ИГРЫ";
+    $("excerpt").value = article?.excerpt || "";
+    $("body").value = article?.body || "";
+    $("symbol").value = article?.symbol || "🎮";
+    $("color").value = article?.color || "#a04dff";
+    $("published").checked = article?.published === true;
+    $("editor").hidden = false;
+    $("editor").scrollIntoView({behavior:"smooth"});
+  }
+
+  function renderArticles() {
+    $("my-articles").innerHTML = articles.length ? articles.map(a => `
+      <div class="article-row">
+        <h3>${esc(a.title)}</h3>
+        <p class="muted">${a.published ? "Опубликована" : "Черновик"} · ${esc(a.type)}</p>
+        <p>${esc(a.excerpt)}</p>
+        <div class="actions">
+          <button data-edit="${esc(a.id)}">Редактировать</button>
+          <button data-delete="${esc(a.id)}">Удалить</button>
+        </div>
+      </div>`).join("") : "<p>У тебя пока нет статей. Создай первую!</p>";
+  }
+
+  async function loadArticles() {
+    const {data, error} = await db.from("articles")
+      .select("*").eq("author_id", user.id).order("created_at", {ascending:false});
+    if (error) throw error;
+    articles = data || [];
+    renderArticles();
+  }
+
+  async function init() {
+    const {data, error} = await db.auth.getUser();
+    if (error) message(error.message);
+    user = data?.user || null;
+    $("login-panel").hidden = !!user;
+    $("editor").hidden = true;
+    $("articles-panel").hidden = !user;
+    $("logout").hidden = !user;
+
+    if (!user) {
+      $("user-info").textContent = "Войди, чтобы управлять своими статьями.";
+      return;
+    }
+
+    $("user-info").textContent = "Ты вошёл как " + (user.email || "пользователь");
+    try {
+      await loadArticles();
+    } catch (e) {
+      message("Не удалось загрузить статьи: " + e.message);
+    }
+  }
+
+  $("login-form").addEventListener("submit", async e => {
+    e.preventDefault();
+    const {error} = await db.auth.signInWithPassword({
+      email: $("email").value.trim(),
+      password: $("password").value
+    });
+    if (error) return message(error.message);
+    message("Вход выполнен.");
+    await init();
+  });
+
+  $("new-article").onclick = () => showEditor();
+  $("cancel-edit").onclick = () => {
+    editingId = null;
+    $("editor").hidden = true;
+  };
+
+  $("article-form").addEventListener("submit", async e => {
+    e.preventDefault();
+    if (!user) return message("Сначала войди в аккаунт.");
+
+    const published = $("published").checked;
+    const payload = {
+      title: $("title").value.trim(),
+      type: $("type").value,
+      category: $("category").value.trim(),
+      excerpt: $("excerpt").value.trim(),
+      body: $("body").value.trim(),
+      symbol: $("symbol").value.trim() || "🎮",
+      color: $("color").value,
+      published,
+      published_at: published ? new Date().toISOString() : null
+    };
+
+    $("save-btn").disabled = true;
+    try {
+      let result;
+      if (editingId !== null) {
+        result = await db.from("articles").update(payload)
+          .eq("id", editingId).eq("author_id", user.id);
+      } else {
+        result = await db.from("articles").insert({
+          ...payload,
+          author_id: user.id,
+          likes: 0,
+          created_at: new Date().toISOString()
+        });
+      }
+      if (result.error) throw result.error;
+      message(editingId !== null ? "Статья обновлена." : "Статья создана.");
+      $("editor").hidden = true;
+      editingId = null;
+      await loadArticles();
+    } catch (err) {
+      message("Ошибка сохранения: " + err.message);
+    } finally {
+      $("save-btn").disabled = false;
+    }
+  });
+
+  $("my-articles").addEventListener("click", async e => {
+    const editButton = e.target.closest("[data-edit]");
+    const deleteButton = e.target.closest("[data-delete]");
+
+    if (editButton) {
+      const article = articles.find(a => String(a.id) === editButton.dataset.edit);
+      if (article) showEditor(article);
+    }
+
+    if (deleteButton && confirm("Точно удалить эту статью?")) {
+      const {error} = await db.from("articles").delete()
+        .eq("id", deleteButton.dataset.delete).eq("author_id", user.id);
+      if (error) return message("Ошибка удаления: " + error.message);
+      message("Статья удалена.");
+      await loadArticles();
+    }
+  });
+
+  $("logout").onclick = async () => {
+    const {error} = await db.auth.signOut();
+    if (error) message(error.message);
+    await init();
+  };
+
+  init();
+})();
+</script>
+</body>
+</html>
+
