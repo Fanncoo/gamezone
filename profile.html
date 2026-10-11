@@ -149,7 +149,42 @@
         </label>
         <label>Категория<input id="category" maxlength="60" value="ИГРЫ" required></label>
         <label>Краткое описание<textarea id="excerpt" maxlength="500" required></textarea></label>
-        <label>Текст статьи<textarea id="body" required></textarea></label>
+        
+<label>Обложка статьи — ссылка на изображение
+  <input id="cover-url" type="url" maxlength="1000"
+    placeholder="https://example.com/game-cover.jpg">
+</label>
+
+<div id="cover-preview-wrap" hidden>
+  <p class="muted">Предпросмотр обложки</p>
+  <img id="cover-preview" alt="Обложка статьи"
+    style="width:100%;max-height:300px;object-fit:cover;border-radius:12px">
+</div>
+
+<label>Текст статьи</label>
+
+<div id="editor-toolbar" class="form-actions">
+  <button type="button" class="plain-btn" data-cmd="bold"><b>B</b></button>
+  <button type="button" class="plain-btn" data-cmd="italic"><i>I</i></button>
+  <button type="button" class="plain-btn" data-cmd="underline"><u>U</u></button>
+  <button type="button" class="plain-btn" data-cmd="formatBlock" data-value="h2">Заголовок</button>
+  <button type="button" class="plain-btn" data-cmd="formatBlock" data-value="h3">Подзаголовок</button>
+  <button type="button" class="plain-btn" data-cmd="insertUnorderedList">• Список</button>
+  <button type="button" class="plain-btn" data-cmd="insertOrderedList">1. Список</button>
+  <button type="button" class="plain-btn" data-cmd="formatBlock" data-value="blockquote">Цитата</button>
+  <button type="button" class="plain-btn" id="insert-link">Добавить ссылку</button>
+  <button type="button" class="plain-btn" id="insert-image">Вставить изображение</button>
+  <button type="button" class="plain-btn" id="toggle-preview">Предпросмотр</button>
+</div>
+
+<div id="body" contenteditable="true" role="textbox"
+  aria-multiline="true" aria-label="Текст статьи"
+  style="min-height:300px;padding:20px;border:1px solid #303644;border-radius:10px;background:#0c0e14;color:#f4f5f8;line-height:1.8;overflow-wrap:anywhere">
+  <p>Начни писать свою статью...</p>
+</div>
+
+<p class="muted">Слов: <span id="word-count">0</span></p>
+
         <label>Символ обложки<input id="symbol" maxlength="10" value="🎮" required></label>
         <label>Цвет обложки
           <select id="color">
