@@ -35,7 +35,7 @@ $("account-btn").onclick = () => {
     return;
   }
 
-  window.location.href = "profile.html";
+  window.location.href = "./profile.html";
 };
 
 $("search-toggle").onclick=()=>$("search-row").classList.toggle("hidden");function search(){const q=$("search-input").value.trim().toLowerCase();document.querySelectorAll(".game-card").forEach(el=>el.classList.toggle("hidden",!!q&&!el.textContent.toLowerCase().includes(q)));if(q)$("articles").scrollIntoView({behavior:"smooth"})}$("search-btn").onclick=search;$("search-input").addEventListener("keydown",e=>{if(e.key==="Enter")search()});
