@@ -7,16 +7,60 @@
 <title>Мой профиль — GameZone</title>
 <link rel="stylesheet" href="styles.css">
 <style>
-.profile-wrap{max-width:1000px;margin:50px auto;padding:24px}
-.profile-panel{background:#171923;border:1px solid #303443;border-radius:16px;padding:24px;margin:20px 0}
-.profile-wrap input,.profile-wrap textarea,.profile-wrap select{display:block;width:100%;box-sizing:border-box;margin:8px 0 16px;padding:12px;border-radius:8px;border:1px solid #45495b;background:#101119;color:white}
-.profile-wrap textarea{min-height:150px}
-.profile-wrap label{display:block;color:#ddd}
-.profile-wrap .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-.profile-wrap button{cursor:pointer;padding:10px 16px;border:0;border-radius:8px}
-.article-row{padding:16px 0;border-bottom:1px solid #303443}
-.muted{color:#a7aabd}
-#message{white-space:pre-wrap}
+.profile-wrap{width:min(1050px,92%);margin:38px auto 70px}
+.profile-top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px}
+.profile-top h1{font-size:clamp(38px,6vw,58px);margin:12px 0}
+.profile-card{position:relative;overflow:hidden;background:radial-gradient(ellipse at 90% 0%,#f0445228,transparent 45%),linear-gradient(135deg,#191d28,#101219);border:1px solid #ffffff12;border-radius:18px;padding:30px;margin-bottom:22px}
+.profile-card:before{content:"";position:absolute;right:-65px;top:-110px;width:260px;height:260px;border:1px solid #f0445220;border-radius:50%;pointer-events:none}
+.profile-identity{display:flex;align-items:center;gap:23px;position:relative}
+.profile-avatar{width:116px;height:116px;flex-shrink:0;border-radius:50%;border:3px solid #f04452;background:linear-gradient(135deg,#f04452,#752d92);display:grid;place-items:center;color:white;font:700 42px Oswald,sans-serif;overflow:hidden;box-shadow:0 0 35px #f0445225}
+.profile-avatar img{width:100%;height:100%;object-fit:cover}
+.profile-name{font:600 clamp(29px,5vw,43px) Oswald,sans-serif;margin:8px 0}
+.profile-email{font-size:12px;color:#a4a9b7;overflow-wrap:anywhere}
+.profile-bio{color:#c3c6d0;line-height:1.8;font-size:13px;white-space:pre-wrap;margin:20px 0 0}
+.profile-links{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}
+.profile-links a{color:#ff8991;font-size:12px;overflow-wrap:anywhere}
+.profile-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:20px 0}
+.stat-card{padding:19px;background:#171a23;border:1px solid #ffffff0e;border-radius:12px}
+.stat-card strong{display:block;font:600 30px Oswald,sans-serif}
+.stat-card span{font-size:10px;color:#9ca2b1;letter-spacing:1px;text-transform:uppercase}
+.profile-panel{background:#141720;border:1px solid #ffffff12;border-radius:14px;padding:24px;margin:20px 0}
+.profile-panel h2{font:600 27px Oswald,sans-serif;margin:0 0 18px}
+.profile-form{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.profile-form label,.article-form label{display:grid;gap:8px;color:#c6cad4;font-size:11px;font-weight:700}
+.profile-form .wide{grid-column:1/-1}
+.profile-wrap input:not([type=checkbox]),.profile-wrap textarea,.profile-wrap select{width:100%;box-sizing:border-box;padding:12px 13px;border-radius:8px;border:1px solid #303644;background:#0c0e14;color:#f4f5f8;outline:none}
+.profile-wrap input:focus,.profile-wrap textarea:focus,.profile-wrap select:focus{border-color:#f04452}
+.profile-wrap textarea{min-height:100px;resize:vertical}
+.profile-wrap input[type=checkbox]{accent-color:#f04452}
+.form-actions,.article-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:16px}
+.profile-wrap button{cursor:pointer}
+.profile-wrap button:disabled{opacity:.6;cursor:wait}
+.profile-wrap .plain-btn{background:#242936;border:1px solid #373e4e;color:white;border-radius:7px;padding:11px 15px}
+.profile-wrap .plain-btn:hover{background:#303646}
+.profile-wrap .muted{color:#969cab;font-size:12px;line-height:1.7}
+#message{white-space:pre-wrap;overflow-wrap:anywhere;color:#ff9299;font-size:12px}
+#message:empty{display:none}
+.section-heading{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.article-row{padding:18px 0;border-bottom:1px solid #ffffff12}
+.article-row:last-child{border-bottom:0}
+.article-row h3{margin:0 0 9px;font-size:16px}
+.article-row p{font-size:12px;line-height:1.7;color:#aeb3c0}
+.article-status{display:inline-block;border:1px solid #ffffff18;border-radius:5px;padding:5px 8px;font-size:10px;color:#b9f36a}
+.article-status.draft{color:#ffc66d}
+#logout{margin-top:12px}
+@media(max-width:600px){
+ .profile-wrap{margin-top:24px}
+ .profile-card,.profile-panel{padding:19px}
+ .profile-identity{align-items:flex-start;gap:15px}
+ .profile-avatar{width:82px;height:82px;font-size:31px}
+ .profile-form{grid-template-columns:1fr}
+ .profile-form .wide{grid-column:auto}
+ .profile-stats{gap:8px}
+ .stat-card{padding:13px 10px}
+ .stat-card strong{font-size:24px}
+ .stat-card span{font-size:9px}
+}
 </style>
 </head>
 <body>
@@ -26,61 +70,114 @@
 </header>
 
 <main class="profile-wrap">
-  <div class="eyebrow">GAMEZONE ACCOUNT</div>
-  <h1>Мой профиль</h1>
-  <p id="user-info" class="muted">Проверяем авторизацию...</p>
+  <div class="profile-top">
+    <div>
+      <div class="eyebrow">GAMEZONE / PLAYER ACCOUNT</div>
+      <h1>Мой профиль</h1>
+    </div>
+  </div>
+
   <p id="message" role="status"></p>
 
   <section id="login-panel" class="profile-panel" hidden>
-    <h2>Войди в аккаунт</h2>
-    <p>Используй аккаунт GameZone, который ты уже зарегистрировал.</p>
-    <form id="login-form">
-      <label>Email<input id="email" type="email" required></label>
-      <label>Пароль<input id="password" type="password" required></label>
-      <button class="btn btn-red" type="submit">Войти</button>
-    </form>
-  </section>
-
-  <section id="editor" class="profile-panel" hidden>
-    <h2 id="editor-title">Создать статью</h2>
-    <form id="article-form">
-      <label>Заголовок<input id="title" maxlength="160" required></label>
-      <label>Тип публикации
-        <select id="type">
-          <option value="article">Статья</option>
-          <option value="news">Новость</option>
-          <option value="review">Обзор</option>
-        </select>
-      </label>
-      <label>Категория<input id="category" maxlength="60" value="ИГРЫ" required></label>
-      <label>Краткое описание<textarea id="excerpt" maxlength="500" required></textarea></label>
-      <label>Текст статьи<textarea id="body" required></textarea></label>
-      <label>Символ или эмодзи<input id="symbol" maxlength="10" value="🎮" required></label>
-      <label>Цвет обложки
-        <select id="color">
-          <option value="#a04dff">Фиолетовый</option>
-          <option value="#f04452">Красный</option>
-          <option value="#3273d9">Синий</option>
-          <option value="#20a879">Зелёный</option>
-          <option value="#f59e0b">Оранжевый</option>
-        </select>
-      </label>
-      <label><input id="published" type="checkbox" style="display:inline;width:auto"> Опубликовать сразу</label>
-      <div class="actions">
-        <button class="btn btn-red" id="save-btn" type="submit">Сохранить статью</button>
-        <button type="button" id="cancel-edit">Отмена</button>
+    <h2>С возвращением!</h2>
+    <p class="muted">Войди в свой GameZone аккаунт, чтобы открыть профиль и управлять статьями.</p>
+    <form id="login-form" class="article-form">
+      <label>Email<input id="email" type="email" autocomplete="email" required></label>
+      <label>Пароль<input id="password" type="password" autocomplete="current-password" required></label>
+      <div class="form-actions">
+        <button class="btn btn-red" type="submit">Войти в аккаунт</button>
       </div>
     </form>
   </section>
 
-  <section id="articles-panel" class="profile-panel" hidden>
-    <div class="section-heading">
-      <h2>Мои статьи</h2>
-      <button class="btn btn-red" id="new-article">+ Создать статью</button>
-    </div>
-    <div id="my-articles"></div>
-  </section>
-  <button id="logout" hidden>Выйти из аккаунта</button>
+  <div id="account-area" hidden>
+    <section class="profile-card">
+      <div class="profile-identity">
+        <div id="avatar" class="profile-avatar">G</div>
+        <div>
+          <div class="eyebrow">PLAYER PROFILE</div>
+          <h2 id="display-name" class="profile-name">Игрок</h2>
+          <div id="display-email" class="profile-email"></div>
+          <div id="member-since" class="profile-email"></div>
+        </div>
+      </div>
+      <p id="display-bio" class="profile-bio"></p>
+      <div id="profile-links" class="profile-links"></div>
+    </section>
+
+    <section class="profile-stats">
+      <div class="stat-card"><strong id="stat-articles">0</strong><span>Всего статей</span></div>
+      <div class="stat-card"><strong id="stat-published">0</strong><span>Опубликовано</span></div>
+      <div class="stat-card"><strong id="stat-likes">0</strong><span>Лайки</span></div>
+    </section>
+
+    <section class="profile-panel">
+      <h2>Настройки профиля</h2>
+      <p class="muted">Расскажи сообществу о себе. Для аватарки вставь прямую ссылку на изображение, начинающуюся с https://.</p>
+      <form id="profile-form">
+        <div class="profile-form">
+          <label>Имя игрока
+            <input id="profile-username" maxlength="40" placeholder="Например, GameMaster" required>
+          </label>
+          <label>Ссылка на аватарку
+            <input id="profile-avatar-url" type="url" maxlength="500" placeholder="https://example.com/avatar.png">
+          </label>
+          <label class="wide">О себе
+            <textarea id="profile-bio" maxlength="500" placeholder="Какие игры любишь? Расскажи о себе..."></textarea>
+          </label>
+          <label class="wide">Твой сайт или соцсеть
+            <input id="profile-website" type="url" maxlength="300" placeholder="https://example.com">
+          </label>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-red" id="save-profile" type="submit">Сохранить профиль</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="editor" class="profile-panel" hidden>
+      <h2 id="editor-title">Создать статью</h2>
+      <form id="article-form" class="article-form">
+        <label>Заголовок<input id="title" maxlength="160" required></label>
+        <label>Тип публикации
+          <select id="type">
+            <option value="article">Статья</option>
+            <option value="news">Новость</option>
+            <option value="review">Обзор</option>
+          </select>
+        </label>
+        <label>Категория<input id="category" maxlength="60" value="ИГРЫ" required></label>
+        <label>Краткое описание<textarea id="excerpt" maxlength="500" required></textarea></label>
+        <label>Текст статьи<textarea id="body" required></textarea></label>
+        <label>Символ обложки<input id="symbol" maxlength="10" value="🎮" required></label>
+        <label>Цвет обложки
+          <select id="color">
+            <option value="#a04dff">Фиолетовый</option>
+            <option value="#f04452">Красный</option>
+            <option value="#3273d9">Синий</option>
+            <option value="#20a879">Зелёный</option>
+            <option value="#f59e0b">Оранжевый</option>
+          </select>
+        </label>
+        <label><span><input id="published" type="checkbox"> Опубликовать сразу</span></label>
+        <div class="form-actions">
+          <button class="btn btn-red" id="save-btn" type="submit">Сохранить статью</button>
+          <button class="plain-btn" id="cancel-edit" type="button">Отмена</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="profile-panel">
+      <div class="section-heading">
+        <h2>Мои статьи</h2>
+        <button class="btn btn-red" id="new-article" type="button">+ Создать статью</button>
+      </div>
+      <div id="my-articles"><p class="muted">Загружаем статьи...</p></div>
+    </section>
+
+    <button class="plain-btn" id="logout" type="button">Выйти из аккаунта</button>
+  </div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -89,20 +186,193 @@
 (() => {
   const cfg = window.GAMEZONE_CONFIG || {};
   const $ = id => document.getElementById(id);
-  const message = text => $("message").textContent = text;
+  const say = text => { $("message").textContent = text || ""; };
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   })[c]);
 
   if (!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY || !window.supabase) {
-    message("Не удалось подключить Supabase. Проверь config.js.");
+    say("Не удалось подключить Supabase. Проверь config.js.");
     return;
   }
 
   const db = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
-  let user = null;
-  let articles = [];
-  let editingId = null;
+  let user = null, profile = null, articles = [], editingId = null;
+
+  function validUrl(value) {
+    try {
+      const u = new URL(value);
+      return u.protocol === "https:" || u.protocol === "http:";
+    } catch {
+      return false;
+    }
+  }
+
+  function safeUrl(value) {
+    const v = String(value || "").trim();
+    return validUrl(v) ? v : "";
+  }
+
+  function initials(name) {
+    return (String(name || "G").trim().charAt(0) || "G").toUpperCase();
+  }
+
+  function dateText(value) {
+    if (!value) return "Дата регистрации неизвестна";
+    const d = new Date(value);
+    return Number.isNaN(d.getTime()) ? "" : "В GameZone с " +
+      d.toLocaleDateString("ru-RU", {day:"numeric",month:"long",year:"numeric"});
+  }
+
+  function renderAvatar(url, name) {
+    const box = $("avatar");
+    const safe = safeUrl(url);
+    box.textContent = "";
+    if (safe) {
+      const img = document.createElement("img");
+      img.src = safe;
+      img.alt = "Аватар игрока";
+      img.referrerPolicy = "no-referrer";
+      img.onerror = () => { box.replaceChildren(); box.textContent = initials(name); };
+      box.appendChild(img);
+    } else {
+      box.textContent = initials(name);
+    }
+  }
+
+  function renderProfile() {
+    const name = profile?.username || user?.email?.split("@")[0] || "Игрок";
+    $("display-name").textContent = name;
+    $("display-email").textContent = user?.email || "";
+    $("member-since").textContent = dateText(profile?.created_at || user?.created_at);
+    $("display-bio").textContent = profile?.bio || "Этот игрок ещё ничего не рассказал о себе.";
+    renderAvatar(profile?.avatar_url, name);
+
+    const links = $("profile-links");
+    links.replaceChildren();
+    const website = safeUrl(profile?.website);
+    if (website) {
+      const a = document.createElement("a");
+      a.href = website;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.textContent = "↗ Мой сайт";
+      links.appendChild(a);
+    }
+
+    $("profile-username").value = profile?.username || "";
+    $("profile-avatar-url").value = profile?.avatar_url || "";
+    $("profile-bio").value = profile?.bio || "";
+    $("profile-website").value = profile?.website || "";
+
+    $("stat-articles").textContent = articles.length;
+    $("stat-published").textContent = articles.filter(a => a.published).length;
+    $("stat-likes").textContent = articles.reduce((sum, a) => sum + (Number(a.likes) || 0), 0);
+  }
+
+  function renderArticles() {
+    $("my-articles").innerHTML = articles.length ? articles.map(a => `
+      <div class="article-row">
+        <div class="section-heading">
+          <h3>${esc(a.title)}</h3>
+          <span class="article-status ${a.published ? "" : "draft"}">${a.published ? "Опубликована" : "Черновик"}</span>
+        </div>
+        <p>${esc(a.excerpt || "")}</p>
+        <p class="muted">${esc(a.type || "article")} · ♥ ${Number(a.likes) || 0}</p>
+        <div class="article-actions">
+          <button class="plain-btn" data-edit="${esc(a.id)}" type="button">Редактировать</button>
+          <button class="plain-btn" data-delete="${esc(a.id)}" type="button">Удалить</button>
+        </div>
+      </div>`).join("") : '<p class="muted">У тебя пока нет статей. Нажми «Создать статью», чтобы начать!</p>';
+    renderProfile();
+  }
+
+  async function loadProfileData() {
+    const {data, error} = await db.from("profiles")
+      .select("*").eq("id", user.id).maybeSingle();
+    if (error) throw error;
+    profile = data;
+    if (!profile) throw new Error("Профиль не найден в таблице profiles.");
+    renderProfile();
+  }
+
+  async function loadArticles() {
+    const {data, error} = await db.from("articles").select("*")
+      .eq("author_id", user.id).order("created_at", {ascending:false});
+    if (error) throw error;
+    articles = data || [];
+    renderArticles();
+  }
+
+  async function init() {
+    say("");
+    const {data, error} = await db.auth.getUser();
+    if (error) say(error.message);
+    user = data?.user || null;
+
+    $("login-panel").hidden = !!user;
+    $("account-area").hidden = !user;
+
+    if (!user) {
+      profile = null;
+      articles = [];
+      return;
+    }
+
+    try {
+      await loadProfileData();
+      await loadArticles();
+    } catch (e) {
+      say("Ошибка загрузки профиля или статей: " + e.message);
+    }
+  }
+
+  $("login-form").addEventListener("submit", async e => {
+    e.preventDefault();
+    say("");
+    const {error} = await db.auth.signInWithPassword({
+      email: $("email").value.trim(),
+      password: $("password").value
+    });
+    if (error) return say(error.message);
+    await init();
+  });
+
+  $("profile-form").addEventListener("submit", async e => {
+    e.preventDefault();
+    if (!user) return say("Сначала войди в аккаунт.");
+
+    const username = $("profile-username").value.trim();
+    const avatar = $("profile-avatar-url").value.trim();
+    const bio = $("profile-bio").value.trim();
+    const website = $("profile-website").value.trim();
+
+    if (!username) return say("Введи имя игрока.");
+    if (avatar && !validUrl(avatar)) return say("Ссылка на аватарку должна начинаться с http:// или https://.");
+    if (website && !validUrl(website)) return say("Ссылка на сайт должна начинаться с http:// или https://.");
+
+    const btn = $("save-profile");
+    btn.disabled = true;
+    try {
+      const {data, error} = await db.from("profiles").update({
+        username,
+        avatar_url: avatar || null,
+        bio: bio || null,
+        website: website || null,
+        updated_at: new Date().toISOString()
+      }).eq("id", user.id).select("*").maybeSingle();
+
+      if (error) throw error;
+      if (!data) throw new Error("Профиль не обновлён. Проверь, что строка пользователя есть в profiles и разрешено обновление своего профиля.");
+      profile = data;
+      renderProfile();
+      say("Профиль успешно сохранён!");
+    } catch (err) {
+      say("Не удалось сохранить профиль: " + err.message);
+    } finally {
+      btn.disabled = false;
+    }
+  });
 
   function showEditor(article = null) {
     editingId = article ? article.id : null;
@@ -116,62 +386,8 @@
     $("color").value = article?.color || "#a04dff";
     $("published").checked = article?.published === true;
     $("editor").hidden = false;
-    $("editor").scrollIntoView({behavior:"smooth"});
+    $("editor").scrollIntoView({behavior:"smooth", block:"start"});
   }
-
-  function renderArticles() {
-    $("my-articles").innerHTML = articles.length ? articles.map(a => `
-      <div class="article-row">
-        <h3>${esc(a.title)}</h3>
-        <p class="muted">${a.published ? "Опубликована" : "Черновик"} · ${esc(a.type)}</p>
-        <p>${esc(a.excerpt)}</p>
-        <div class="actions">
-          <button data-edit="${esc(a.id)}">Редактировать</button>
-          <button data-delete="${esc(a.id)}">Удалить</button>
-        </div>
-      </div>`).join("") : "<p>У тебя пока нет статей. Создай первую!</p>";
-  }
-
-  async function loadArticles() {
-    const {data, error} = await db.from("articles")
-      .select("*").eq("author_id", user.id).order("created_at", {ascending:false});
-    if (error) throw error;
-    articles = data || [];
-    renderArticles();
-  }
-
-  async function init() {
-    const {data, error} = await db.auth.getUser();
-    if (error) message(error.message);
-    user = data?.user || null;
-    $("login-panel").hidden = !!user;
-    $("editor").hidden = true;
-    $("articles-panel").hidden = !user;
-    $("logout").hidden = !user;
-
-    if (!user) {
-      $("user-info").textContent = "Войди, чтобы управлять своими статьями.";
-      return;
-    }
-
-    $("user-info").textContent = "Ты вошёл как " + (user.email || "пользователь");
-    try {
-      await loadArticles();
-    } catch (e) {
-      message("Не удалось загрузить статьи: " + e.message);
-    }
-  }
-
-  $("login-form").addEventListener("submit", async e => {
-    e.preventDefault();
-    const {error} = await db.auth.signInWithPassword({
-      email: $("email").value.trim(),
-      password: $("password").value
-    });
-    if (error) return message(error.message);
-    message("Вход выполнен.");
-    await init();
-  });
 
   $("new-article").onclick = () => showEditor();
   $("cancel-edit").onclick = () => {
@@ -181,7 +397,7 @@
 
   $("article-form").addEventListener("submit", async e => {
     e.preventDefault();
-    if (!user) return message("Сначала войди в аккаунт.");
+    if (!user) return say("Сначала войди в аккаунт.");
 
     const published = $("published").checked;
     const payload = {
@@ -197,6 +413,7 @@
     };
 
     $("save-btn").disabled = true;
+    say("");
     try {
       let result;
       if (editingId !== null) {
@@ -206,43 +423,46 @@
         result = await db.from("articles").insert({
           ...payload,
           author_id: user.id,
-          likes: 0,
-          created_at: new Date().toISOString()
+          likes: 0
         });
       }
       if (result.error) throw result.error;
-      message(editingId !== null ? "Статья обновлена." : "Статья создана.");
       $("editor").hidden = true;
       editingId = null;
       await loadArticles();
+      say("Статья сохранена.");
     } catch (err) {
-      message("Ошибка сохранения: " + err.message);
+      say("Ошибка сохранения статьи: " + err.message);
     } finally {
       $("save-btn").disabled = false;
     }
   });
 
   $("my-articles").addEventListener("click", async e => {
-    const editButton = e.target.closest("[data-edit]");
-    const deleteButton = e.target.closest("[data-delete]");
+    const edit = e.target.closest("[data-edit]");
+    const del = e.target.closest("[data-delete]");
 
-    if (editButton) {
-      const article = articles.find(a => String(a.id) === editButton.dataset.edit);
+    if (edit) {
+      const article = articles.find(a => String(a.id) === edit.dataset.edit);
       if (article) showEditor(article);
     }
 
-    if (deleteButton && confirm("Точно удалить эту статью?")) {
-      const {error} = await db.from("articles").delete()
-        .eq("id", deleteButton.dataset.delete).eq("author_id", user.id);
-      if (error) return message("Ошибка удаления: " + error.message);
-      message("Статья удалена.");
-      await loadArticles();
+    if (del && confirm("Точно удалить эту статью?")) {
+      try {
+        const {error} = await db.from("articles").delete()
+          .eq("id", del.dataset.delete).eq("author_id", user.id);
+        if (error) throw error;
+        await loadArticles();
+        say("Статья удалена.");
+      } catch (err) {
+        say("Ошибка удаления: " + err.message);
+      }
     }
   });
 
   $("logout").onclick = async () => {
     const {error} = await db.auth.signOut();
-    if (error) message(error.message);
+    if (error) say(error.message);
     await init();
   };
 
@@ -251,4 +471,3 @@
 </script>
 </body>
 </html>
-
