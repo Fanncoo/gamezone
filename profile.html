@@ -225,7 +225,169 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   })[c]);
+ 
+    function safeHttpUrl(value) {
+    const url = String(value || "").trim();
+    try {
+      const parsed = new URL(url);
+      return ["https:", "http:"].includes(parsed.protocol) ? url : "";
+    } catch {
+      return "";
+    }
+  }
 
+  function cleanArticleHtml(html) {
+    const allowedTags = [
+      "P", "BR", "H2", "H3", "STRONG", "B", "EM", "I",
+      "U", "UL", "OL", "LI", "BLOCKQUOTE", "A", "IMG"
+    ];
+
+    const template = document.createElement("template");
+    template.innerHTML = String(html || "");
+
+    function cleanNode(node) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        return document.createTextNode(node.textContent);
+      }
+
+      if (node.nodeType !== Node.ELEMENT_NODE) {
+        return document.createDocumentFragment();
+      }
+
+      const tag = node.tagName;
+
+      if (!allowedTags.includes(tag)) {
+        const fragment = document.createDocumentFragment();
+        [...node.childNodes].forEach(child => {
+          fragment.appendChild(cleanNode(child));
+        });
+        return fragment;
+      }
+
+      const clean = document.createElement(tag.toLowerCase());
+
+      if (tag === "A") {
+        const href = safeHttpUrl(node.getAttribute("href"));
+        if (href) {
+          clean.setAttribute("href", href);
+          clean.setAttribute("target", "_blank");
+          clean.setAttribute("rel", "noopener noreferrer");
+        }
+      }
+
+      if (tag === "IMG") {
+        const src = safeHttpUrl(node.getAttribute("src"));
+        if (!src) return document.createDocumentFragment();
+
+        clean.setAttribute("src", src);
+        clean.setAttribute("alt", node.getAttribute("alt") || "");
+        clean.setAttribute("loading", "lazy");
+      }
+
+      [...node.childNodes].forEach(child => {
+        clean.appendChild(cleanNode(child));
+      });
+
+      return clean;
+    }
+
+    const result = document.createElement("div");
+    [...template.content.childNodes].forEach(node => {
+      result.appendChild(cleanNode(node));
+    });
+
+    return result.innerHTML;
+  }
+
+  function updateWordCount() {
+    const text = $("body").innerText.trim();
+    const count = text ? text.split(/\s+/).length : 0;
+    $("word-count").textContent = count;
+  }
+
+  function updateCoverPreview() {
+    const url = safeHttpUrl($("cover-url").value);
+    const wrap = $("cover-preview-wrap");
+    const img = $("cover-preview");
+
+    if (!url) {
+      img.removeAttribute("src");
+      wrap.hidden = true;
+      return;
+    }
+
+    img.onerror = () => {
+      wrap.hidden = true;
+      say("Не удалось загрузить обложку. Проверь ссылку на изображение.");
+    };
+
+    img.onload = () => {
+      wrap.hidden = false;
+      say("");
+    };
+
+    img.src = url;
+  }
+
+  $("editor-toolbar").addEventListener("click", event => {
+    const button = event.target.closest("[data-cmd]");
+    if (!button || $("body").contentEditable !== "true") return;
+
+    $("body").focus();
+
+    const command = button.dataset.cmd;
+    const value = button.dataset.value || null;
+
+    document.execCommand(command, false, value);
+    updateWordCount();
+  });
+
+  $("body").addEventListener("input", updateWordCount);
+
+  $("cover-url").addEventListener("input", updateCoverPreview);
+
+  $("insert-link").addEventListener("click", () => {
+    const url = prompt("Введи ссылку (https://...)");
+    if (!url) return;
+
+    const safe = safeHttpUrl(url);
+    if (!safe) {
+      say("Введи корректную ссылку, начинающуюся с http:// или https://.");
+      return;
+    }
+
+    $("body").focus();
+    document.execCommand("createLink", false, safe);
+  });
+
+  $("insert-image").addEventListener("click", () => {
+    const url = prompt("Введи прямую ссылку на изображение");
+    if (!url) return;
+
+    const safe = safeHttpUrl(url);
+    if (!safe) {
+      say("Введи корректную ссылку на изображение.");
+      return;
+    }
+
+    $("body").focus();
+    document.execCommand("insertImage", false, safe);
+    updateWordCount();
+  });
+
+  $("toggle-preview").addEventListener("click", () => {
+    const editor = $("body");
+    const button = $("toggle-preview");
+
+    if (editor.contentEditable === "true") {
+      editor.innerHTML = cleanArticleHtml(editor.innerHTML);
+      editor.contentEditable = "false";
+      button.textContent = "Вернуться к редактированию";
+    } else {
+      editor.contentEditable = "true";
+      button.textContent = "Предпросмотр";
+    }
+  });
   if (!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY || !window.supabase) {
     say("Не удалось подключить Supabase. Проверь config.js.");
     return;
@@ -445,7 +607,8 @@ updateWordCount();
       type: $("type").value,
       category: $("category").value.trim(),
       excerpt: $("excerpt").value.trim(),
-      body: $("body").value.trim(),
+      body: cleanArticleHtml($("body").innerHTML),
+cover_url: safeHttpUrl($("cover-url").value.trim()) || null,
       symbol: $("symbol").value.trim() || "🎮",
       color: $("color").value,
       published,
